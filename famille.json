@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "prenom": "Jean",
+    "nom": "Kouokam",
+    "date_naissance": "1940-01-01",
+    "sexe": "H",
+    "profession": "Cultivateur",
+    "parents": [],
+    "enfants": ["2", "3"]
+  },
+  {
+    "id": "2",
+    "prenom": "Paul",
+    "nom": "Kouokam",
+    "date_naissance": "1965-05-12",
+    "sexe": "H",
+    "profession": "Professeur",
+    "parents": ["1"],
+    "enfants": ["4"]
+  },
+  {
+    "id": "3",
+    "prenom": "Marie",
+    "nom": "Kouokam",
+    "date_naissance": "1968-08-21",
+    "sexe": "F",
+    "profession": "Commerçante",
+    "parents": ["1"],
+    "enfants": ["5"]
+  },
+  {
+    "id": "4",
+    "prenom": "Steve",
+    "nom": "Kouokam",
+    "date_naissance": "1990-04-10",
+    "sexe": "H",
+    "profession": "Ingénieur",
+    "parents": ["2"],
+    "enfants": ["6"]
+  },
+  {
+    "id": "5",
+    "prenom": "Claire",
+    "nom": "Kouokam",
+    "date_naissance": "1992-09-30",
+    "sexe": "F",
+    "profession": "Médecin",
+    "parents": ["3"],
+    "enfants": ["7"]
+  },
+  {
+    "id": "6",
+    "prenom": "Nathan",
+    "nom": "Kouokam",
+    "date_naissance": "2015-03-15",
+    "sexe": "H",
+    "profession": null,
+    "parents": ["4"],
+    "enfants": []
+  },
+  {
+    "id": "7",
+    "prenom": "Alicia",
+    "nom": "Kouokam",
+    "date_naissance": "2017-06-05",
+    "sexe": "F",
+    "profession": null,
+    "parents": ["5"],
+    "enfants": []
+  }
+]
