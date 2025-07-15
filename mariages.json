@@ -1,0 +1,20 @@
+[
+  {
+    "id": "M1",
+    "conjoint_1": "2",
+    "conjoint_2": "8",
+    "enfants": ["4", "9"]
+  },
+  {
+    "id": "M2",
+    "conjoint_1": "2",
+    "conjoint_2": "10",
+    "enfants": ["12", "13"]
+  },
+  {
+    "id": "M3",
+    "conjoint_1": "3",
+    "conjoint_2": "11",
+    "enfants": ["14"]
+  }
+]
