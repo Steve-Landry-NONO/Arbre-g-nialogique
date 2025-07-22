@@ -1,131 +1,93 @@
 // fichier : script.js
 
-d3.json("data.json").then(function(data) {
-  const width = 960;
-  const dx = 10;
-  const dy = width / 6;
+// Visualisation de l’arbre généalogique avec nœuds de mariage explicites
 
-  const tree = d3.tree().nodeSize([dx, dy]);
-  const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+const width = 960;
+const height = 600;
 
-  // Transformation récursive pour injecter les spouses comme enfants secondaires
-  function transformerStructure(node) {
-    if (node.spouses && node.spouses.length > 0) {
-      node.children = node.spouses.map(spouse => {
-        let s = {
-          name: spouse.name + " (époux(se))",
-          date: spouse.date,
-          profession: spouse.profession,
-          children: spouse.children ? spouse.children.map(transformerStructure) : []
-        };
-        return s;
-      });
-    }
-    return node;
-  }
+const svg = d3.select("#tree-container")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .append("g")
+  .attr("transform", "translate(40,40)");
 
-  const root = d3.hierarchy(transformerStructure(data));
-  root.x0 = dy / 2;
-  root.y0 = 0;
+// Échelle de couleur pour genre
+const color = d => {
+  if (d.type === "mariage") return "#999";
+  return d.sexe === "H" ? "#3498db" : "#e74c3c";
+};
 
-  const svg = d3.select("#tree-container").append("svg")
-      .attr("viewBox", [-dy / 3, -dx, width, dx * 20])
-      .style("font", "14px sans-serif")
-      .style("user-select", "none");
+// Taille des nœuds
+const radius = d => d.type === "mariage" ? 5 : 12;
 
-  const gLink = svg.append("g")
-      .attr("fill", "none")
-      .attr("stroke", "#555")
-      .attr("stroke-opacity", 0.4)
-      .attr("stroke-width", 1.5);
+// Charger les données
+fetch("data.json")
+  .then(response => response.json())
+  .then(data => {
+    const simulation = d3.forceSimulation(data.nodes)
+      .force("link", d3.forceLink(data.links).id(d => d.id).distance(80))
+      .force("charge", d3.forceManyBody().strength(-300))
+      .force("center", d3.forceCenter(width / 2, height / 2));
 
-  const gNode = svg.append("g")
-      .attr("cursor", "pointer")
-      .attr("pointer-events", "all");
+    // Lignes de liens
+    const link = svg.append("g")
+      .attr("stroke", "#ccc")
+      .attr("stroke-width", 1.5)
+      .selectAll("line")
+      .data(data.links)
+      .enter().append("line");
 
-  function update(source) {
-    const nodes = root.descendants().reverse();
-    const links = root.links();
+    // Nœuds
+    const node = svg.append("g")
+      .selectAll("circle")
+      .data(data.nodes)
+      .enter().append("circle")
+      .attr("r", d => radius(d))
+      .attr("fill", d => color(d))
+      .call(drag(simulation));
 
-    tree(root);
+    // Étiquettes
+    const label = svg.append("g")
+      .selectAll("text")
+      .data(data.nodes.filter(d => d.type === "personne"))
+      .enter().append("text")
+      .text(d => d.name)
+      .attr("font-size", 12)
+      .attr("dy", -15)
+      .attr("text-anchor", "middle");
 
-    let left = root;
-    let right = root;
-    root.eachBefore(node => {
-      if (node.x < left.x) left = node;
-      if (node.x > right.x) right = node;
+    simulation.on("tick", () => {
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+      label
+        .attr("x", d => d.x)
+        .attr("y", d => d.y);
     });
-
-    const height = right.x - left.x + dx * 2;
-
-    const transition = svg.transition().duration(750)
-        .attr("viewBox", [-dy / 3, left.x - dx, width, height]);
-
-    const node = gNode.selectAll("g")
-        .data(nodes, d => d.data.name + d.depth);
-
-    const nodeEnter = node.enter().append("g")
-        .attr("transform", d => `translate(${source.y0},${source.x0})`)
-        .on("click", (event, d) => {
-          d.children = d.children ? null : d._children;
-          update(d);
-        });
-
-    nodeEnter.append("circle")
-        .attr("r", 4.5)
-        .attr("fill", d => d._children ? "#555" : "#999");
-
-    nodeEnter.append("title")
-        .text(d => `Nom : ${d.data.name}\nNaissance : ${d.data.date || 'Inconnue'}\nProfession : ${d.data.profession || 'Non renseignée'}`);
-
-    nodeEnter.append("text")
-        .attr("dy", "0.31em")
-        .attr("x", d => d._children ? -10 : 10)
-        .attr("text-anchor", d => d._children ? "end" : "start")
-        .text(d => d.data.name)
-        .clone(true).lower()
-        .attr("stroke", "white");
-
-    const nodeUpdate = node.merge(nodeEnter).transition(transition)
-        .attr("transform", d => `translate(${d.y},${d.x})`);
-
-    nodeUpdate.select("circle")
-        .attr("fill", d => d._children ? "#555" : "#999");
-
-    const nodeExit = node.exit().transition(transition).remove()
-        .attr("transform", d => `translate(${source.y},${source.x})`);
-
-    nodeExit.select("circle").attr("r", 1e-6);
-    nodeExit.select("text").style("fill-opacity", 1e-6);
-
-    const link = gLink.selectAll("path")
-        .data(links, d => d.target.data.name + d.target.depth);
-
-    const linkEnter = link.enter().append("path")
-        .attr("d", d => {
-          const o = {x: source.x0, y: source.y0};
-          return diagonal({source: o, target: o});
-        });
-
-    link.merge(linkEnter).transition(transition)
-        .attr("d", diagonal);
-
-    link.exit().transition(transition).remove()
-        .attr("d", d => {
-          const o = {x: source.x, y: source.y};
-          return diagonal({source: o, target: o});
-        });
-
-    root.eachBefore(d => {
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
-  }
-
-  root.children?.forEach(child => {
-    child._children = child.children;
-    child.children = null;
   });
 
-  update(root);
-});
+function drag(simulation) {
+  return d3.drag()
+    .on("start", function (event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", function (event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", function (event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    });
+}
