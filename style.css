@@ -32,9 +32,17 @@ svg {
 circle {
   stroke: #333;
   stroke-width: 1.5px;
+  cursor: grab;
 }
 
 text {
-  font-size: 14px;
-  fill: #000;
+  font-size: 12px;
+  fill: #222;
+  pointer-events: none;
+  font-weight: 500;
+}
+
+circle:hover {
+  stroke: #000;
+  stroke-width: 2px;
 }
