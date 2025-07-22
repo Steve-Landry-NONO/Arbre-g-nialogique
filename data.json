@@ -1,45 +1,24 @@
 {
-  "name": "Jean Kouokam",
-  "date": "1940-01-01",
-  "profession": "Cultivateur",
-  "children": [
-    {
-      "name": "Paul Kouokam",
-      "date": "1965-05-12",
-      "profession": "Professeur",
-      "children": [
-        {
-          "name": "Steve Kouokam",
-          "date": "1990-04-10",
-          "profession": "Ingénieur",
-          "children": [
-            {
-              "name": "Nathan Kouokam",
-              "date": "2015-03-15",
-              "profession": null
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Marie Kouokam",
-      "date": "1968-08-21",
-      "profession": "Commerçante",
-      "children": [
-        {
-          "name": "Claire Kouokam",
-          "date": "1992-09-30",
-          "profession": "Médecin",
-          "children": [
-            {
-              "name": "Alicia Kouokam",
-              "date": "2017-06-05",
-              "profession": null
-            }
-          ]
-        }
-      ]
-    }
+  "nodes": [
+    { "id": "H1", "type": "personne", "name": "Jean", "sexe": "H" },
+    { "id": "F1", "type": "personne", "name": "Claire", "sexe": "F" },
+    { "id": "F2", "type": "personne", "name": "Rose", "sexe": "F" },
+
+    { "id": "M1", "type": "mariage" },
+    { "id": "M2", "type": "mariage" },
+
+    { "id": "E1", "type": "personne", "name": "Enfant 1", "sexe": "H" },
+    { "id": "E2", "type": "personne", "name": "Enfant 2", "sexe": "F" },
+    { "id": "E3", "type": "personne", "name": "Enfant 3", "sexe": "F" }
+  ],
+  "links": [
+    { "source": "H1", "target": "M1" },
+    { "source": "F1", "target": "M1" },
+    { "source": "H1", "target": "M2" },
+    { "source": "F2", "target": "M2" },
+
+    { "source": "M1", "target": "E1" },
+    { "source": "M1", "target": "E2" },
+    { "source": "M2", "target": "E3" }
   ]
 }
